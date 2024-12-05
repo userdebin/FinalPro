@@ -46,6 +46,16 @@ public class Bullet : NetworkBehaviour
             parent.DespawnBulletsServerRpc();
             other.gameObject.GetComponent<PlayerSettings>().TakeDamageServerRpc(bulletDamage);
         }
+        else if (other.gameObject.CompareTag("Enemy")) // Tambahkan logika untuk musuh
+        {
+            if (parent == null)
+            {
+                return;
+            }
+
+            other.gameObject.GetComponent<Enemy>().StunEnemy(); // Panggil fungsi stun pada Enemy
+            parent.DespawnBulletsServerRpc();
+        }
     }
 
     private void DespawnObject()

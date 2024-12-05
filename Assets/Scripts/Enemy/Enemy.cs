@@ -1,10 +1,6 @@
-//Enemy.cs
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-
-
 
 public class Enemy : MonoBehaviour
 {
@@ -16,12 +12,14 @@ public class Enemy : MonoBehaviour
 
     public NavMeshAgent Agent { get => agent; }
 
-    //just for debugging purpose
+    // Debugging purpose
     [SerializeField]
     private string currentState;
 
     public Path path;
 
+    private bool isStunned = false; // Status apakah musuh sedang stun
+    private float stunDuration = 2f; // Durasi stun
 
     void Start()
     {
@@ -32,6 +30,8 @@ public class Enemy : MonoBehaviour
 
     void Update()
     {
+        if (isStunned) return; // Jika musuh stun, hentikan semua aktivitas
+
         CheckFOV();
 
         if (stateMachine.activeState != null)
@@ -53,5 +53,24 @@ public class Enemy : MonoBehaviour
                 stateMachine.ChangeState(stateMachine.searchState); // Trigger SearchState
             }
         }
+    }
+
+    public void StunEnemy()
+    {
+        if (isStunned) return; // Cegah stun jika musuh sudah terstun
+        StartCoroutine(StunCoroutine());
+    }
+
+    private IEnumerator StunCoroutine()
+    {
+        isStunned = true;
+        agent.isStopped = true; // Hentikan pergerakan NavMeshAgent
+        Debug.Log("Enemy stunned!");
+
+        yield return new WaitForSeconds(stunDuration);
+
+        isStunned = false;
+        agent.isStopped = false; // Lanjutkan pergerakan NavMeshAgent
+        Debug.Log("Enemy recovered from stun!");
     }
 }
